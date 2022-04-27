@@ -8,12 +8,11 @@ end
 
 
 I = imread("IMG_2609.jpg");
-mosaic1 = makeMosaic(I, PhotoData);
-imshow(mosaic1)
+mosaic = makeMosaic(I, PhotoData);
 
 
 
-function finishedMosaic = makeMosaic(I, PhotoData)
+function mosaic = makeMosaic(I, PhotoData):
 [x, y, z] = size(I);
 a = round(sqrt((x * y)/2500 ))
 newX = floor(x/a)
@@ -32,7 +31,7 @@ end
 %imageList = imageList(2:end);
 %disp(imageList);
 %fMontage = montage(imageList, 'Size', [newX newY]);
-finishedMosaic = I(1:1:a*newX, 1:a*newY, :);
+I = I(1:1:a*newX, 1:a*newY, :);
 end
 %montageImage = imread(fMontage.cData);
 %imshow(montageImage)

@@ -1,6 +1,5 @@
 import requests
 import xml.etree.ElementTree as ET
-import json
 
 appKey = 'acc38164845454913c919d70c34b6afb'
 appSecret = '792e854a83cc0a01'
