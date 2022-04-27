@@ -11,13 +11,22 @@ end
 % Iterate through all images in ./srcImages and make mosaic for each
 sourceImages = dir("srcImages");
 sourceImages = sourceImages(3:end, :);
+numImages = 2000;
+imSizeChange = 500;
 for i = 1:size(sourceImages, 1)
-    imSrc = ['./srcImages/' sourceImages(i, :).name]
+    imSrc = ['./srcImages/' sourceImages(i, :).name];
     I = imread(imSrc);
-    m = makeMosaic(I, PhotoData, 2500);
+    m = makeMosaic(I, PhotoData, numImages);
     figure; imshow(m);
+    numImages = numImages + imSizeChange;
+    imSizeChange = imSizeChange * -1;
+    mosaicLoc = ['./mosaics/' sourceImages(i, :).name];
+    imwrite(m, mosaicLoc);
 end
-
+% imSrc = ['./srcImages/' 'ball.jpg'];
+% I = imread(imSrc);
+% m = makeMosaic(I, PhotoData, 2500);
+% figure; imshow(m);
 % Creates mosaic
 function finishedMosaic = makeMosaic(I, PhotoData, numTiles)
 % Finds size and figures out size of image necessary to fit roughly
@@ -53,10 +62,10 @@ function [mosaicPhoto, id] = getRandomPhoto(I, paneX, paneY, a, PhotoData)
     % Finds closest pixel distance where there are a sufficient number
     % of photos to draw from so that the same image isn't overused.
     % When less than 20 images available, return to higher cutoff.
-    for distance = 105:-10:5
+    for distance = 85:-5:5
         closeTable = PhotoData(abs(PhotoData.R - aR) < distance & abs(PhotoData.G - aG) < distance & abs(PhotoData.B - aB) < distance, :);
-        if size(closeTable, 1) < 20
-            closeTable = PhotoData(abs(PhotoData.R - aR) < distance + 10 & abs(PhotoData.G - aG) < distance + 10 & abs(PhotoData.B - aB) < distance + 10, :);
+        if size(closeTable, 1) < 15
+            closeTable = PhotoData(abs(PhotoData.R - aR) < distance + 5 & abs(PhotoData.G - aG) < distance + 10 & abs(PhotoData.B - aB) < distance + 5, :);
             break
         end
     end
@@ -68,10 +77,13 @@ function [mosaicPhoto, id] = getRandomPhoto(I, paneX, paneY, a, PhotoData)
     % Opens tile, sizes it correctly, adds it to image, and returns
     % Updated image.
     tile = imread(tileSrc{1});
+    a/50;
     tile = imresize(tile, a/50);
+    tile = imresize(tile, a/size(tile, 1));
     I(1 + a * (paneY - 1): 1 + a * (paneY - 1) + (a - 1), 1 + a * (paneX - 1): 1 + a * (paneX - 1) + (a - 1), :) = I(1 + a * (paneY - 1): 1 + a * (paneY - 1) + (a - 1), 1 + a * (paneX - 1): 1 + a * (paneX - 1) + (a - 1), :) .* .3 + tile .* .7;
-    imshow(I)
+    % imshow(I)
     mosaicPhoto = I;
+    % imshow(I)
     id = closeTable(1, :).Var1;
 end
 
@@ -92,7 +104,8 @@ function tileTable = downloadImages()
     mkdir NaturePhotos
     % Download each image from stored URL and save it as a 50x50 image
     for i = 1:size(PhotoData, 1)
-        imgName = strcat('./NaturePhotos/',num2str(PhotoData.Var1(i)), '.jpg')
+        i
+        imgName = strcat('./NaturePhotos/',num2str(PhotoData.Var1(i)), '.jpg');
         temp = PhotoData.URL(i);
         PhotoData.SRC(i) = {imgName};
         loaded = 0;
@@ -124,3 +137,6 @@ function tileTable = downloadImages()
     writetable(PhotoData, 'naturePhotos.csv');
     tileTable = PhotoData;
 end
+
+
+
